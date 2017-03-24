@@ -1,0 +1,15 @@
+{
+  "name": "koovble",
+  "version": "1.0.2",
+  "description": "Bluetooth Low Energy Device for KOOV Core",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tadashi Kimura",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.6.3",
+    "noble-device": "^1.4.1"
+  }
+}

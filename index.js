@@ -24,7 +24,7 @@
  */
 
 'use strict';
-var debug = require('debug')('koovdev_device');
+var debug = require('debug')('koovble');
 
 const BLE_OPTS = {
   BTS01: {

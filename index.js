@@ -41,7 +41,18 @@ const BLE_OPTS = {
 
 const KoovBle = (() => {
   if (process.platform === 'win32') {
-    return null;
+    /*
+     * THe following check must be same as the one in
+     * noble-uwp/index.js.
+     */
+    const os = require('os');
+    const ver = os.release().split('.').map(Number);
+    if (!(ver[0] > 10 ||
+          (ver[0] === 10 && ver[1] > 0) ||
+          (ver[0] === 10 && ver[1] === 0 && ver[2] >= 15014))) {
+      // BLE is not supported for this version.
+      return null;
+    }
   }
   const noble_device = require('noble-device');
   let ble = function(peripheral) {

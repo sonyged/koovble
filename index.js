@@ -97,9 +97,9 @@ const KoovBle = (() => {
                                 debug('notify callback', err);
                               });
   };
+  ble.BLE_OPTS = BLE_OPTS;
   return ble;
 })();
-KoovBle.BLE_OPTS = BLE_OPTS;
 
 module.exports = {
     KoovBle: KoovBle

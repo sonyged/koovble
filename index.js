@@ -75,10 +75,25 @@ const KoovBle = (() => {
                                  BLE_OPTS.BTS01.characteristic_tx,
                                  data, done);
   };
+  let listener = null;
   ble.prototype.read = function(done) {
     this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
                               BLE_OPTS.BTS01.characteristic_rx,
                               true, done, function(err) {
+                                debug('notify callback', err);
+                                listener = done;
+                              });
+  };
+  ble.prototype.stopReading = function(done) {
+    if (!listener) {
+      return done();
+    }
+    this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
+                              BLE_OPTS.BTS01.characteristic_rx,
+                              false, listener, function(err) {
+                                debug('notify stop callback', err, listener);
+                                listener = null;
+                                done();
                                 debug('notify callback', err);
                               });
   };

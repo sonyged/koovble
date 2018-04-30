@@ -41,7 +41,18 @@ const BLE_OPTS = {
 
 const KoovBle = (() => {
   if (process.platform === 'win32') {
-    return null;
+    /*
+     * THe following check must be same as the one in
+     * noble-uwp/index.js.
+     */
+    const os = require('os');
+    const ver = os.release().split('.').map(Number);
+    if (!(ver[0] > 10 ||
+          (ver[0] === 10 && ver[1] > 0) ||
+          (ver[0] === 10 && ver[1] === 0 && ver[2] >= 15014))) {
+      // BLE is not supported for this version.
+      return null;
+    }
   }
   const noble_device = require('noble-device');
   let ble = function(peripheral) {
@@ -64,16 +75,31 @@ const KoovBle = (() => {
                                  BLE_OPTS.BTS01.characteristic_tx,
                                  data, done);
   };
+  let listener = null;
   ble.prototype.read = function(done) {
     this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
                               BLE_OPTS.BTS01.characteristic_rx,
                               true, done, function(err) {
                                 debug('notify callback', err);
+                                listener = done;
                               });
   };
+  ble.prototype.stopReading = function(done) {
+    if (!listener) {
+      return done();
+    }
+    this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
+                              BLE_OPTS.BTS01.characteristic_rx,
+                              false, listener, function(err) {
+                                debug('notify stop callback', err, listener);
+                                listener = null;
+                                done();
+                                debug('notify callback', err);
+                              });
+  };
+  ble.BLE_OPTS = BLE_OPTS;
   return ble;
 })();
-KoovBle.BLE_OPTS = BLE_OPTS;
 
 module.exports = {
     KoovBle: KoovBle

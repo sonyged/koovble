@@ -54,7 +54,18 @@ const KoovBle = (() => {
       return null;
     }
   }
-  const noble_device = require('noble-device');
+  const noble_device = (() => {
+    try {
+      return require('noble-device');
+    } catch (e) {
+      debug('failed to require noble-device', e);
+      return null;
+    }
+  })();
+  if (!noble_device) {
+    // BLE is not supported on this device.
+    return null;
+  }
   let ble = function(peripheral) {
     noble_device.call(this, peripheral);
   };

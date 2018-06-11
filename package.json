@@ -1,6 +1,6 @@
 {
   "name": "koovble",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Bluetooth Low Energy Device for KOOV Core",
   "main": "index.js",
   "scripts": {

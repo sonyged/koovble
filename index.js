@@ -49,7 +49,7 @@ const KoovBle = (() => {
     const ver = os.release().split('.').map(Number);
     if (!(ver[0] > 10 ||
           (ver[0] === 10 && ver[1] > 0) ||
-          (ver[0] === 10 && ver[1] === 0 && ver[2] >= 15014))) {
+          (ver[0] === 10 && ver[1] === 0 && ver[2] >= 15063))) {
       // BLE is not supported for this version.
       return null;
     }

@@ -1,6 +1,6 @@
 {
   "name": "koovble",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Bluetooth Low Energy Device for KOOV Core",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,6 @@
   "license": "SEE LICENSE in ./LICENSE",
   "dependencies": {
     "debug": "^2.6.3",
-    "noble-device": "https://github.com/sonyged/noble-device.git#a22e5476b5e33f8a2d2efaad77cb81caefb85db6"
+    "noble-device": "https://github.com/sonyged/noble-device.git#9a39c9a2ff5bf319f4b1d72dc21a54eb0b7b55c8"
   }
 }

@@ -10,6 +10,6 @@
   "license": "SEE LICENSE in ./LICENSE",
   "dependencies": {
     "debug": "^2.6.3",
-    "noble-device": "https://github.com/sonyged/noble-device.git#dbb30f53c2eebdac7d7b02d94c60080d4fd4b77d"
+    "noble-device": "https://github.com/sonyged/noble-device.git#715cbf484204670aa4a805eb67e8e6ca85fa6e7c"
   }
 }

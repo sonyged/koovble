@@ -72,6 +72,9 @@ const KoovBle = (() => {
   ble.SCAN_UUIDS = [BLE_OPTS.BTS01.service_id];
   noble_device.Util.inherits(ble, noble_device);
   ble.prototype.writeGPIO = function(data, done) {
+    if (data instanceof Uint8Array) {
+      data = Buffer.from(data);
+    }
     this.writeDataCharacteristic(BLE_OPTS.BTS01_GPIO.service_id,
                                  BLE_OPTS.BTS01_GPIO.characteristic_tx,
                                  data, done);
@@ -82,6 +85,9 @@ const KoovBle = (() => {
                                 done);
   };
   ble.prototype.write = function(data, done) {
+    if (data instanceof Uint8Array) {
+      data = Buffer.from(data);
+    }
     this.writeDataCharacteristic(BLE_OPTS.BTS01.service_id,
                                  BLE_OPTS.BTS01.characteristic_tx,
                                  data, done);

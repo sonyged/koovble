@@ -66,8 +66,36 @@ const KoovBle = (() => {
     // BLE is not supported on this device.
     return null;
   }
-  let ble = function(peripheral) {
+  const ble = function(peripheral) {
     noble_device.call(this, peripheral);
+    this.koov_context = {};
+    const kc = this.koov_context;
+    kc.listener = null;
+    kc.write_queue = [];
+  };
+  const write_data = (ble, data, done) => {
+    if (data instanceof Uint8Array) {
+      data = Buffer.from(data);
+    }
+    ble.writeDataCharacteristic(
+      BLE_OPTS.BTS01.service_id,
+      BLE_OPTS.BTS01.characteristic_tx,
+      data, done);
+  };
+  const write_push = (ble, data, done) => (
+    ble.koov_context.write_queue.push({ data, done }));
+  const write_flush = (ble) => {
+    const kc = ble.koov_context;
+    if (!kc.listener)
+      // No listener is ready.  Postpone writing.
+      return;
+    if (kc.write_queue.length === 0)
+      return;
+    const { data, done } = kc.write_queue.shift();
+    write_data(ble, data, (err) => {
+      done(err);
+      write_flush(ble);
+    });
   };
   ble.SCAN_UUIDS = [BLE_OPTS.BTS01.service_id];
   noble_device.Util.inherits(ble, noble_device);
@@ -85,34 +113,35 @@ const KoovBle = (() => {
                                 done);
   };
   ble.prototype.write = function(data, done) {
-    if (data instanceof Uint8Array) {
-      data = Buffer.from(data);
-    }
-    this.writeDataCharacteristic(BLE_OPTS.BTS01.service_id,
-                                 BLE_OPTS.BTS01.characteristic_tx,
-                                 data, done);
+    write_push(this, data, done);
+    write_flush(this);
   };
-  let listener = null;
   ble.prototype.read = function(done) {
-    this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
-                              BLE_OPTS.BTS01.characteristic_rx,
-                              true, done, function(err) {
-                                debug('notify callback', err);
-                                listener = done;
-                              });
+    this.notifyCharacteristic(
+      BLE_OPTS.BTS01.service_id,
+      BLE_OPTS.BTS01.characteristic_rx,
+      true, done, function(err) {
+        debug('read: notify callback', err);
+        const kc = this.koov_context;
+        kc.listener = done;
+        write_flush(this);
+      }.bind(this));
   };
   ble.prototype.stopReading = function(done) {
-    if (!listener) {
+    const kc = this.koov_context;
+    if (!kc.listener) {
       return done();
     }
-    this.notifyCharacteristic(BLE_OPTS.BTS01.service_id,
-                              BLE_OPTS.BTS01.characteristic_rx,
-                              false, listener, function(err) {
-                                debug('notify stop callback', err, listener);
-                                listener = null;
-                                done();
-                                debug('notify callback', err);
-                              });
+    this.notifyCharacteristic(
+      BLE_OPTS.BTS01.service_id,
+      BLE_OPTS.BTS01.characteristic_rx,
+      false, kc.listener, function(err) {
+        const kc = this.koov_context;
+        debug( 'notify stop callback', err, kc.listener);
+        kc.listener = null;
+        done();
+        debug('stopReading: notify callback', err);
+      }.bind(this));
   };
   ble.BLE_OPTS = BLE_OPTS;
   return ble;
